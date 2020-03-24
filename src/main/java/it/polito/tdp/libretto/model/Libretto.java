@@ -2,6 +2,8 @@ package it.polito.tdp.libretto.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -11,24 +13,35 @@ import java.util.List;
  *
  */
 public class Libretto {
+	
+	// nested private class
+	private class ConfrontaPerVoto implements Comparator<Voto> {
+
+		@Override
+		public int compare(Voto o1, Voto o2) {
+			// TODO Auto-generated method stub
+			return o2.getVoto()-o1.getVoto();
+		}
+		
+	}
 
 	private List<Voto> voti = new ArrayList<>();
-	
+
 	/**
 	 * Crea un libretto nuovo (e vuoto)
 	 */
 	public Libretto() {
-		super() ;
+		super();
 	}
-	
-	/** 
-	 * Copy Constructor
-	 * "Shallow" (copia superficiale)
+
+	/**
+	 * Copy Constructor "Shallow" (copia superficiale)
+	 * 
 	 * @param lib
 	 */
 	public Libretto(Libretto lib) {
-		super() ;
-		this.voti.addAll(lib.voti) ;
+		super();
+		this.voti.addAll(lib.voti);
 	}
 
 	/**
@@ -36,16 +49,16 @@ public class Libretto {
 	 * 
 	 * @param v Voto da aggiungere
 	 * @return {@code true} se ha inserito il voto, {@code false} se non l'ha
-	 * inserito perché era in conflitto oppure era duplicato.
+	 *         inserito perché era in conflitto oppure era duplicato.
 	 */
 	public boolean add(Voto v) {
-		if(this.isConflitto(v) || this.isDuplicato(v)) {
+		if (this.isConflitto(v) || this.isDuplicato(v)) {
 			// non inserire il voto
-			return false ; // segnala al chiamante che non ha avuto successo
+			return false; // segnala al chiamante che non ha avuto successo
 		} else {
 			// inserisici il voto perché non è in conflitto né duplicato
 			this.voti.add(v);
-			return true ;
+			return true;
 		}
 	}
 
@@ -65,21 +78,22 @@ public class Libretto {
 		}
 		return s;
 	}
-	
+
 	/**
-	 * Genera un nuovo libretto, a partire da quello esistente,
-	 * che conterrà esclusivamenti i voti con votazione pari a quella specificata.
+	 * Genera un nuovo libretto, a partire da quello esistente, che conterrà
+	 * esclusivamenti i voti con votazione pari a quella specificata.
+	 * 
 	 * @param voto votazione specificata
 	 * @return nuovo Libretto "ridotto"
 	 */
 	public Libretto estraiVotiUguali(int voto) {
-		Libretto nuovo = new Libretto() ;
-		for(Voto v: this.voti) {
-			if(v.getVoto()==voto) {
+		Libretto nuovo = new Libretto();
+		for (Voto v : this.voti) {
+			if (v.getVoto() == voto) {
 				nuovo.add(v);
 			}
 		}
-		return nuovo ;
+		return nuovo;
 	}
 
 	public String toString() {
@@ -91,65 +105,58 @@ public class Libretto {
 	}
 
 	/**
-	 * Data il nome di un corso, ricerca se quell'esame esiste
-	 * nel libretto, ed in caso affermativo restituisce l'oggetto
-	 * {@link Voto} corrispondente.
-	 * Se l'esame non esiste, restituisce {@ null}.
+	 * Data il nome di un corso, ricerca se quell'esame esiste nel libretto, ed in
+	 * caso affermativo restituisce l'oggetto {@link Voto} corrispondente. Se
+	 * l'esame non esiste, restituisce {@ null}.
 	 * 
 	 * @param nomeCorso nome esame da cercare
 	 * @return il {@link Voto} corrispondente, oppure {@code null} se non esiste
 	 */
 	public Voto cercaNomeCorso(String nomeCorso) {
 		/*
-		for (Voto v: this.voti) {
-			if(nomeCorso.equals(v.getCorso())) {
-				return v ;
-			}
-		}
-		return null;
-		*/
-		
-		int pos = this.voti.indexOf(new Voto(nomeCorso, 0, null)) ;
-		if(pos != -1) {
-			return this.voti.get(pos) ;
+		 * for (Voto v: this.voti) { if(nomeCorso.equals(v.getCorso())) { return v ; } }
+		 * return null;
+		 */
+
+		int pos = this.voti.indexOf(new Voto(nomeCorso, 0, null));
+		if (pos != -1) {
+			return this.voti.get(pos);
 		} else {
-			return null ;
+			return null;
 		}
 	}
-	
+
 	/**
-	 * Ritorna {@code true} se il corso specificato da {@code v}
-	 * esiste nel libretto, con la stessa valutazione.
-	 * Se non esiste, o se la valutazione è diversa, ritorna {@code false}.
+	 * Ritorna {@code true} se il corso specificato da {@code v} esiste nel
+	 * libretto, con la stessa valutazione. Se non esiste, o se la valutazione è
+	 * diversa, ritorna {@code false}.
+	 * 
 	 * @param v il {@link Voto} da ricercare
 	 * @return l'esistenza di un duplicato
 	 */
 	public boolean isDuplicato(Voto v) {
-		Voto esiste = this.cercaNomeCorso(v.getCorso()) ;
-		if(esiste==null) // non l'ho trovato ==> non è un duplicato
-			return false ;
-		
+		Voto esiste = this.cercaNomeCorso(v.getCorso());
+		if (esiste == null) // non l'ho trovato ==> non è un duplicato
+			return false;
+
 		/*
-		if(esiste.getVoto()==v.getVoto())
-			return true ;
-		else
-			return false ;
-			*/
-		
-		return ( esiste.getVoto() == v.getVoto() ) ;
+		 * if(esiste.getVoto()==v.getVoto()) return true ; else return false ;
+		 */
+
+		return (esiste.getVoto() == v.getVoto());
 	}
-	
+
 	/**
-	 * Determina se esiste un voto con lo stesso nome corso ma valutazione
-	 * diversa
+	 * Determina se esiste un voto con lo stesso nome corso ma valutazione diversa
+	 * 
 	 * @param v
 	 * @return
 	 */
 	public boolean isConflitto(Voto v) {
-		Voto esiste = this.cercaNomeCorso(v.getCorso()) ;
-		if(esiste==null) // non l'ho trovato ==> non è un duplicato
-			return false ;
-		return ( esiste.getVoto() != v.getVoto() ) ;
+		Voto esiste = this.cercaNomeCorso(v.getCorso());
+		if (esiste == null) // non l'ho trovato ==> non è un duplicato
+			return false;
+		return (esiste.getVoto() != v.getVoto());
 	}
 
 	/**
@@ -158,57 +165,84 @@ public class Libretto {
 	 * @return
 	 */
 	public Libretto creaLibrettoMigliorato() {
-		Libretto nuovo = new Libretto() ;
-		
-		for(Voto v : this.voti) {
+		Libretto nuovo = new Libretto();
+
+		for (Voto v : this.voti) {
 //			Voto v2 = new Voto(v) ;
-			Voto v2 = v.clone() ;
-			
+			Voto v2 = v.clone();
+
 			// NON CI PIACE : Voto v3 = new Voto(v.getCorso(), v.getVoto(), v.getData()) ;
-			
-			if(v2.getVoto()>=24) {
-				v2.setVoto(v2.getVoto()+2);
-				if(v2.getVoto()>30)
+
+			if (v2.getVoto() >= 24) {
+				v2.setVoto(v2.getVoto() + 2);
+				if (v2.getVoto() > 30)
 					v2.setVoto(30);
-			} else if (v2.getVoto()>=18) {
-				v2.setVoto(v2.getVoto()+1);
+			} else if (v2.getVoto() >= 18) {
+				v2.setVoto(v2.getVoto() + 1);
 			}
-			
-			nuovo.add(v2) ;
+
+			nuovo.add(v2);
 		}
-		
-		return nuovo ;
+
+		return nuovo;
 	}
-	
+
 	/**
-	 * riordina i voti presenti nel libretto corrente
-	 * alfabeticamente per corso
+	 * riordina i voti presenti nel libretto corrente alfabeticamente per corso
 	 */
 	public void ordinaPerCorso() {
-		Collections.sort(this.voti) ;
+		Collections.sort(this.voti);
+//		this.voti.sort(null);
 	}
-	
+
 	public void ordinaPerVoto() {
 		Collections.sort(this.voti, new ConfrontaVotiPerValutazione());
+
+		/* ALTERNATIVE ALLA DEFINIZIONE DEL COMPARATOR
+		 * DISCUSSE NELLA VIDEO CHAT
+		
+		// Comparator definito con anonymous inline class
+		this.voti.sort(new Comparator<Voto>() {
+			@Override
+			public int compare(Voto o1, Voto o2) {
+				return o2.getVoto() - o1.getVoto();
+			}
+		});
+		
+		// Comparator definito con una "lambda function"
+		this.voti.sort( (Voto o1, Voto o2) -> ( o2.getVoto() - o1.getVoto() ) );
+
+		// Comparator definito con nested class
+		this.voti.sort(new ConfrontaPerVoto());
+		
 //		this.voti.sort(new ConfrontaVotiPerValutazione());
-	}
+		 */
+		}
 
 	/**
 	 * Elimina dal libretto tutti i voti <24
 	 */
 	public void cancellaVotiScarsi() {
-		List<Voto> daRimuovere=new ArrayList<>() ;
-		for(Voto v: this.voti) {
-			if(v.getVoto()<24) {
+
+		Iterator<Voto> iter = this.voti.iterator();
+		while (iter.hasNext()) {
+			Voto v = iter.next();
+			if (v.getVoto() < 24)
+				iter.remove();
+		}
+
+		List<Voto> daRimuovere = new ArrayList<>();
+		for (Voto v : this.voti) {
+			if (v.getVoto() < 24) {
 				daRimuovere.add(v);
 			}
 		}
 
-		this.voti.removeAll(daRimuovere) ;
+		this.voti.removeAll(daRimuovere);
 //		for(Voto v: daRimuovere) {
 //			this.voti.remove(v) ;
 //		}
-		
+
 	}
-	
+
 }
